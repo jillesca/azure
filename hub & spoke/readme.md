@@ -1,22 +1,32 @@
+# CLI Hub & Spoke Topology
+
+- [CLI Hub & Spoke Topology](#cli-hub--spoke-topology)
+  - [Create a Resource Group](#create-a-resource-group)
+  - [Create Hub VNet](#create-hub-vnet)
+  - [Create Gateway configuration](#create-gateway-configuration)
+- [hub configuration](#hub-configuration)
+- [spoke1 configuration](#spoke1-configuration)
+- [spoke2 configuration](#spoke2-configuration)
+
 This is an exercise to create a hub and spoke topology in Azure using 3 VM, 3 VNETs and 1 network gateway.
 
-> <https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-cli>
+## Create a Resource Group
+
+The first part is to create a [resource group](<https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-cli>)
 
 ```bash
 az group create --name techTalk --location northeurope
 ```
 
-```bash
-z group list -o table
-```
-
-> <https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-cli>
+Verify the resource group is there
 
 ```bash
-az network vnet list -o table
+az group list -o table
 ```
 
-> <https://docs.microsoft.com/en-us/azure/vpn-gateway/create-routebased-vpn-gateway-cli>
+## Create Hub VNet
+
+Then we can [create a vnet](<https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-cli>)
 
 ```bash
 az network vnet create \
@@ -27,7 +37,17 @@ az network vnet create \
   --subnet-prefixes 10.0.1.0/24
 ```
 
-### gateway configuration
+Review the vnet is created
+
+```bash
+az network vnet list -o table
+```
+
+## Create Gateway configuration
+
+Next we create the network gateway that will help us route packets between our spokes and remotes VMs through the hub vnet
+
+first, add the `GatewaySubnet` to the hub VNet, this is a keyword the gateway is expecting. Is important to add it.
 
 ```bash
 az network vnet subnet create \
@@ -37,6 +57,8 @@ az network vnet subnet create \
   --address-prefix 10.0.255.0/27
 ```
 
+Then request a public IP that will be used by the Gateway
+
 ```bash
 az network public-ip create \
   --name gateway-ip-address \
@@ -44,6 +66,8 @@ az network public-ip create \
   --allocation-method Dynamic \
   --sku Basic
 ```
+
+Finally create the gateway, this can take a while, aprox 20-40min
 
 ```bash
 az network vnet-gateway create \
