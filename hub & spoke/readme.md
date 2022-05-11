@@ -47,7 +47,7 @@ az network vnet list -o table
 
 Next we create the network gateway that will help us route packets between our spokes and remotes VMs through the hub vnet
 
-first, add the `GatewaySubnet` to the hub VNet, this is a keyword the gateway is expecting. Is important to add it.
+First, add the `GatewaySubnet` to the hub VNet, this is a keyword the gateway is expecting. Is important to add it.
 
 ```bash
 az network vnet subnet create \
@@ -84,6 +84,8 @@ az network vnet-gateway create \
 
 # hub configuration
 
+Create hub VM and add it to the hub vnet
+
 ```bash
 az vm create \
   --resource-group techTalk \
@@ -101,6 +103,8 @@ az vm create \
 
 # spoke1 configuration
 
+Create the spoke1 vnet
+
 ```bash
 az network vnet create \
   --name spoke1-vnet \
@@ -109,6 +113,8 @@ az network vnet create \
   --address-prefixes 10.1.0.0/16 \
   --subnet-prefixes 10.1.1.0/24 
 ```
+
+Create the spoke1 vm
 
 ```bash
 az vm create \
@@ -125,6 +131,8 @@ az vm create \
   --os-disk-delete-option Delete
 ```
 
+Create the [peering between VNets](https://docs.microsoft.com/en-us/cli/azure/network/vnet/peering?view=azure-cli-latest), in this case from the hub to the spoke1 vnet
+
 ```bash
 az network vnet peering create \
     --resource-group techTalk \
@@ -135,6 +143,8 @@ az network vnet peering create \
     --allow-gateway-transit \
     --allow-forwarded-traffic
 ```
+
+Create the peering from the spoke to the hub
 
 ```bash
 az network vnet peering create \
@@ -193,9 +203,12 @@ az network vnet peering create \
     --use-remote-gateways
 ```
 
+let's verify the IPs of the VMs we created:
+
 ```bash
 for vm in hub, spoke1, spoke2
 do
     az vm list-ip-addresses -o table -n $vm
 done
+
 ```
