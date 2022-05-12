@@ -6,7 +6,7 @@
   - [hub](#hub)
   - [Spoke1](#spoke1)
   - [Spoke2](#spoke2)
-- [Create the Virtial Network Gateway](#create-the-virtial-network-gateway)
+- [Create the Virtual Network Gateway](#create-the-virtual-network-gateway)
 - [Create the Hub Virtual Machine](#create-the-hub-virtual-machine)
 - [Create a route between the two spokes](#create-a-route-between-the-two-spokes)
   - [Spoke1](#spoke1-1)
@@ -78,7 +78,7 @@ Review the vnet is created
 az network vnet list -o table
 ```
 
-# Create the Virtial Network Gateway
+# Create the Virtual Network Gateway
 
 Next we create the virtual network gateway that will help us route packets between our spokes and remotes VMs through the hub vnet
 
