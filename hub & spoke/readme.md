@@ -1,13 +1,13 @@
 # CLI Hub & Spoke Topology
 
 - [CLI Hub & Spoke Topology](#cli-hub--spoke-topology)
-  - [Create a Resource Group](#create-a-resource-group)
-  - [Create Hub VNet](#create-hub-vnet)
-  - [Create the Virtial Network Gateway](#create-the-virtial-network-gateway)
-- [Create the Hub Virtual Machine](#create-the-hub-virtual-machine)
-- [Create VNets for Spoke1 & Spoke2](#create-vnets-for-spoke1--spoke2)
+- [Create a Resource Group](#create-a-resource-group)
+- [Create VNets](#create-vnets)
+  - [hub](#hub)
   - [Spoke1](#spoke1)
   - [Spoke2](#spoke2)
+- [Create the Virtial Network Gateway](#create-the-virtial-network-gateway)
+- [Create the Hub Virtual Machine](#create-the-hub-virtual-machine)
 - [Create a route between the two spokes](#create-a-route-between-the-two-spokes)
   - [Spoke1](#spoke1-1)
   - [Spoke2](#spoke2-1)
@@ -21,9 +21,9 @@
 
 This is an exercise to create a hub and spoke topology in Azure using 3 VM, 3 VNETs and 1 network gateway.
 
-## Create a Resource Group
+# Create a Resource Group
 
-The first part is to create a [resource group](<https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-cli>)
+Create a [resource group](<https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-cli>)
 
 ```bash
 az group create --name techTalk --location northeurope
@@ -35,9 +35,11 @@ Verify the resource group is there
 az group list -o table
 ```
 
-## Create Hub VNet
+# Create VNets
 
 Then we can [create a vnet](<https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-cli>)
+
+## hub
 
 ```bash
 az network vnet create \
@@ -48,13 +50,35 @@ az network vnet create \
   --subnet-prefixes 10.0.1.0/24
 ```
 
+## Spoke1
+
+```bash
+az network vnet create \
+  --name spoke1-vnet \
+  --resource-group techTalk \
+  --subnet-name spoke1-subnet \
+  --address-prefixes 10.1.0.0/16 \
+  --subnet-prefixes 10.1.1.0/24 
+```
+
+## Spoke2
+
+```bash
+az network vnet create \
+  --name spoke2-vnet \
+  --resource-group techTalk \
+  --subnet-name spoke2-subnet \
+  --address-prefixes 10.2.0.0/16 \
+  --subnet-prefixes 10.2.1.0/24 
+```
+
 Review the vnet is created
 
 ```bash
 az network vnet list -o table
 ```
 
-## Create the Virtial Network Gateway
+# Create the Virtial Network Gateway
 
 Next we create the virtual network gateway that will help us route packets between our spokes and remotes VMs through the hub vnet
 
@@ -112,34 +136,6 @@ az vm create \
   --os-disk-delete-option Delete
 ```
 
-# Create VNets for Spoke1 & Spoke2
-
-## Spoke1
-
-Create the spoke1 vnet
-
-```bash
-az network vnet create \
-  --name spoke1-vnet \
-  --resource-group techTalk \
-  --subnet-name spoke1-subnet \
-  --address-prefixes 10.1.0.0/16 \
-  --subnet-prefixes 10.1.1.0/24 
-```
-
-## Spoke2
-
-Create the spoke2 vnet
-
-```bash
-az network vnet create \
-  --name spoke2-vnet \
-  --resource-group techTalk \
-  --subnet-name spoke2-subnet \
-  --address-prefixes 10.2.0.0/16 \
-  --subnet-prefixes 10.2.1.0/24 
-```
-
 # Create a route between the two spokes
 
 To be able to ping both spokes through the hub vnet we need to add a route on them to tell them to use the virtual network gateway as next hop.
@@ -177,15 +173,11 @@ az network vnet subnet update \
 
 ## Spoke2
 
-The same process applies for Spoke2
-
 ```bash
 az network route-table create \
   --resource-group techTalk \
   --name spoke2RouteTable 
  ```
-
- Then create the route entry
 
  ```bash
  az network route-table route create \
@@ -195,8 +187,6 @@ az network route-table create \
   --address-prefix 10.1.1.0/24  \
   --next-hop-type VirtualNetworkGateway 
   ```
-
-Finally associate the entry to a subnet
 
 ```bash
 az network vnet subnet update \
@@ -209,8 +199,6 @@ az network vnet subnet update \
 # Create Virtual Machines
 
 ## Spoke1
-
-Create the spoke1 vm
 
 ```bash
 az vm create \
