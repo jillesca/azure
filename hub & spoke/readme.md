@@ -3,13 +3,21 @@
 - [CLI Hub & Spoke Topology](#cli-hub--spoke-topology)
   - [Create a Resource Group](#create-a-resource-group)
   - [Create Hub VNet](#create-hub-vnet)
-  - [Create Virtial Network Gateway configuration](#create-virtial-network-gateway-configuration)
-- [hub configuration](#hub-configuration)
-- [spoke1 configuration](#spoke1-configuration)
-- [spoke2 configuration](#spoke2-configuration)
-  - [Create a route between the two spokes](#create-a-route-between-the-two-spokes)
-    - [Spoke1](#spoke1)
-    - [Spoke2](#spoke2)
+  - [Create the Virtial Network Gateway](#create-the-virtial-network-gateway)
+- [Create the Hub Virtual Machine](#create-the-hub-virtual-machine)
+- [Create VNets for Spoke1 & Spoke2](#create-vnets-for-spoke1--spoke2)
+  - [Spoke1](#spoke1)
+  - [Spoke2](#spoke2)
+- [Create a route between the two spokes](#create-a-route-between-the-two-spokes)
+  - [Spoke1](#spoke1-1)
+  - [Spoke2](#spoke2-1)
+- [Create Virtual Machines](#create-virtual-machines)
+  - [Spoke1](#spoke1-2)
+  - [Spoke2](#spoke2-2)
+- [Configure VNet peering between Hub and Spokes](#configure-vnet-peering-between-hub-and-spokes)
+  - [Spoke1](#spoke1-3)
+  - [Spoke2](#spoke2-3)
+- [Verification](#verification)
 
 This is an exercise to create a hub and spoke topology in Azure using 3 VM, 3 VNETs and 1 network gateway.
 
@@ -46,7 +54,7 @@ Review the vnet is created
 az network vnet list -o table
 ```
 
-## Create Virtial Network Gateway configuration
+## Create the Virtial Network Gateway
 
 Next we create the virtual network gateway that will help us route packets between our spokes and remotes VMs through the hub vnet
 
@@ -85,7 +93,7 @@ az network vnet-gateway create \
   --no-wait
 ```
 
-# hub configuration
+# Create the Hub Virtual Machine
 
 Create hub VM and add it to the hub vnet
 
@@ -104,7 +112,9 @@ az vm create \
   --os-disk-delete-option Delete
 ```
 
-# spoke1 configuration
+# Create VNets for Spoke1 & Spoke2
+
+## Spoke1
 
 Create the spoke1 vnet
 
@@ -117,49 +127,9 @@ az network vnet create \
   --subnet-prefixes 10.1.1.0/24 
 ```
 
-Create the spoke1 vm
+## Spoke2
 
-```bash
-az vm create \
-  --resource-group techTalk \
-  --name spoke1 \
-  --image debian \
-  --generate-ssh-keys \
-  --public-ip-sku Basic \
-  --size Standard_B1ls \
-  --vnet-name spoke1-vnet \
-  --subnet spoke1-subnet \
-  --nic-delete-option Delete \
-  --data-disk-delete-option Delete \
-  --os-disk-delete-option Delete
-```
-
-Create the [peering between VNets](https://docs.microsoft.com/en-us/cli/azure/network/vnet/peering?view=azure-cli-latest), in this case from the hub to the spoke1 vnet
-
-```bash
-az network vnet peering create \
-    --resource-group techTalk \
-    --name spoke1-Peering \
-    --vnet-name hub-vnet \
-    --remote-vnet spoke1-vnet \
-    --allow-vnet-access \
-    --allow-gateway-transit \
-    --allow-forwarded-traffic
-```
-
-Create the peering from the spoke to the hub
-
-```bash
-az network vnet peering create \
-    --resource-group techTalk \
-    --name spoke1-hub-Peering \
-    --vnet-name spoke1-vnet \
-    --remote-vnet hub-vnet \
-    --allow-vnet-access \
-    --use-remote-gateways
-```
-
-# spoke2 configuration
+Create the spoke2 vnet
 
 ```bash
 az network vnet create \
@@ -170,47 +140,11 @@ az network vnet create \
   --subnet-prefixes 10.2.1.0/24 
 ```
 
-```bash
-az vm create \
-  --resource-group techTalk \
-  --name spoke2 \
-  --image debian \
-  --generate-ssh-keys \
-  --public-ip-sku Basic \
-  --size Standard_B1ls \
-  --vnet-name spoke2-vnet \
-  --subnet spoke2-subnet \
-  --nic-delete-option Delete \
-  --data-disk-delete-option Delete \
-  --os-disk-delete-option Delete
-```
-
-```bash
-az network vnet peering create \
-    --resource-group techTalk \
-    --name spoke2-Peering \
-    --vnet-name hub-vnet \
-    --remote-vnet spoke2-vnet \
-    --allow-vnet-access \
-    --allow-gateway-transit \
-    --allow-forwarded-traffic
-```
-
-```bash
-az network vnet peering create \
-    --resource-group techTalk \
-    --name spoke2-hub-Peering \
-    --vnet-name spoke2-vnet \
-    --remote-vnet hub-vnet \
-    --allow-vnet-access \
-    --use-remote-gateways
-```
-
-## Create a route between the two spokes
+# Create a route between the two spokes
 
 To be able to ping both spokes through the hub vnet we need to add a route on them to tell them to use the virtual network gateway as next hop.
 
-### Spoke1
+## Spoke1
 
 First create a route table
 
@@ -241,7 +175,7 @@ az network vnet subnet update \
   --route-table spoke1RouteTable
 ```
 
-### Spoke2
+## Spoke2
 
 The same process applies for Spoke2
 
@@ -271,6 +205,98 @@ az network vnet subnet update \
   --resource-group techTalk \
   --route-table spoke2RouteTable
 ```
+
+# Create Virtual Machines
+
+## Spoke1
+
+Create the spoke1 vm
+
+```bash
+az vm create \
+  --resource-group techTalk \
+  --name spoke1 \
+  --image debian \
+  --generate-ssh-keys \
+  --public-ip-sku Basic \
+  --size Standard_B1ls \
+  --vnet-name spoke1-vnet \
+  --subnet spoke1-subnet \
+  --nic-delete-option Delete \
+  --data-disk-delete-option Delete \
+  --os-disk-delete-option Delete
+```
+
+## Spoke2
+
+```bash
+az vm create \
+  --resource-group techTalk \
+  --name spoke2 \
+  --image debian \
+  --generate-ssh-keys \
+  --public-ip-sku Basic \
+  --size Standard_B1ls \
+  --vnet-name spoke2-vnet \
+  --subnet spoke2-subnet \
+  --nic-delete-option Delete \
+  --data-disk-delete-option Delete \
+  --os-disk-delete-option Delete
+```
+
+# Configure VNet peering between Hub and Spokes
+
+## Spoke1
+
+Create the [peering between VNets](https://docs.microsoft.com/en-us/cli/azure/network/vnet/peering?view=azure-cli-latest), in this case from the hub to the spoke1 vnet
+
+```bash
+az network vnet peering create \
+    --resource-group techTalk \
+    --name spoke1-Peering \
+    --vnet-name hub-vnet \
+    --remote-vnet spoke1-vnet \
+    --allow-vnet-access \
+    --allow-gateway-transit \
+    --allow-forwarded-traffic
+```
+
+Create the peering from the spoke to the hub
+
+```bash
+az network vnet peering create \
+    --resource-group techTalk \
+    --name spoke1-hub-Peering \
+    --vnet-name spoke1-vnet \
+    --remote-vnet hub-vnet \
+    --allow-vnet-access \
+    --use-remote-gateways
+```
+
+## Spoke2
+
+```bash
+az network vnet peering create \
+    --resource-group techTalk \
+    --name spoke2-Peering \
+    --vnet-name hub-vnet \
+    --remote-vnet spoke2-vnet \
+    --allow-vnet-access \
+    --allow-gateway-transit \
+    --allow-forwarded-traffic
+```
+
+```bash
+az network vnet peering create \
+    --resource-group techTalk \
+    --name spoke2-hub-Peering \
+    --vnet-name spoke2-vnet \
+    --remote-vnet hub-vnet \
+    --allow-vnet-access \
+    --use-remote-gateways
+```
+
+# Verification
 
 let's verify the IPs of the VMs we created:
 
