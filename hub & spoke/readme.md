@@ -127,6 +127,8 @@ az network vnet-gateway create \
 
 Create hub VM and add it to the hub vnet
 
+If you want to see the output from the command that creates the VM remove the `--no-wait` argument.
+
 ```bash
 az vm create \
   --resource-group techTalk \
@@ -139,7 +141,8 @@ az vm create \
   --subnet hub-subnet \
   --nic-delete-option Delete \
   --data-disk-delete-option Delete \
-  --os-disk-delete-option Delete
+  --os-disk-delete-option Delete \
+  --no-wait
 ```
 
 # Create a route between the two spokes
@@ -218,7 +221,8 @@ az vm create \
   --subnet spoke1-subnet \
   --nic-delete-option Delete \
   --data-disk-delete-option Delete \
-  --os-disk-delete-option Delete
+  --os-disk-delete-option Delete \
+  --no-wait
 ```
 
 ## Spoke2
@@ -235,7 +239,8 @@ az vm create \
   --subnet spoke2-subnet \
   --nic-delete-option Delete \
   --data-disk-delete-option Delete \
-  --os-disk-delete-option Delete
+  --os-disk-delete-option Delete \
+  --no-wait
 ```
 
 # Configure VNet peering between Hub and Spokes
