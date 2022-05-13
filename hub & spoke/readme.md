@@ -21,6 +21,12 @@
 
 This is an exercise to create a hub and spoke topology in Azure using 3 VM, 3 VNETs and 1 network gateway.
 
+If you haven't start by login to your azure account, this will open a window on your web browser where you can login.
+
+```bash
+az login
+```
+
 # Create a Resource Group
 
 Create a [resource group](<https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-cli>)
