@@ -35,7 +35,7 @@ Create a [resource group](<https://docs.microsoft.com/en-us/azure/azure-resource
 az group create --name techTalk --location northeurope
 ```
 
-Verify the resource group is there
+Verify the Resource Group is there
 
 ```bash
 az group list -o table
@@ -118,7 +118,7 @@ az network vnet-gateway create \
   --resource-group techTalk \
   --vnet hub-vnet \
   --gateway-type Vpn \
-  --sku Basic \
+  --sku Standard \
   --vpn-type RouteBased \
   --no-wait
 ```
