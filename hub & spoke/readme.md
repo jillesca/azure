@@ -35,7 +35,7 @@ Create a [resource group](<https://docs.microsoft.com/en-us/azure/azure-resource
 az group create --name techTalk --location northeurope
 ```
 
-Verify the Resource Group is there
+Verify the Resource Group is there.
 
 ```bash
 az group list -o table
