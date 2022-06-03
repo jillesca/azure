@@ -1,5 +1,7 @@
 # CLI Hub & Spoke Topology
 
+![hub and spoke topology image](src/hub_and_spoke_topology.png)
+
 - [CLI Hub & Spoke Topology](#cli-hub--spoke-topology)
 - [Create a Resource Group](#create-a-resource-group)
 - [Create VNets](#create-vnets)
@@ -20,8 +22,6 @@
 - [Verification](#verification)
 
 This is an exercise to create a hub and spoke topology in Azure using 3 VM, 3 VNETs and 1 network gateway.
-
-![hub and spoke topology image](src/hub_and_spoke_topology.png)
 
 If you haven't start by login to your azure account, this will open a window on your web browser where you can login.
 
